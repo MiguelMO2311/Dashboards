@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products.html</title>
+    <link href="tailwind.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #EFF2F7;
+            font-family: 'Inter', sans-serif;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #3B82F6 0%, #1E293B 100%);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+        .sidebar {
+            background: #2E3A46;
+            width: 80px;
+            height: calc(100vh - 80px);
+            position: fixed;
+            left: 0;
+            top: 80px;
+            padding: 10px;
+            transition: width 0.3s ease;
+        }
+        .sidebar.collapsed {
+            width: 20px;
+        }
+        .content {
+            margin-left: 80px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            height: calc(100vh - 160px);
+        }
+        .collapsed + .content {
+            margin-left: 20px;
+        }
+        .footer {
+            background: linear-gradient(135deg, #3B82F6 0%, #1E293B 100%);
+            padding: 20px;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .toggle-btn {
+            background-color: #444;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .pagination-btn {
+            background-color: #ffffff;
+            color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+        }
+        .sheet {
+            display: none;
+        }
+        .sheet.active {
+            display: block;
+        }
+        .dark-mode {
+            background-color: #10151D;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <img src="logo.png" alt="Logo Empresa" width="50">
+        <h1 id="page-title" class="text-3xl font-bold text-white" contenteditable="true">Hoja Principal</h1>
+        <button onclick="toggleDarkMode()" class="bg-gray-800 hover:bg-gray-600 text-white px-4 py-2 rounded">Modo Oscuro/Claro</button>
+        <button onclick="publicarDashboard()" class="bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded">Publicar</button>
+        <button onclick="generarPDF()" class="bg-purple-500 hover:bg-purple-700 text-white px-4 py-2 rounded">Generar PDF</button>
+        <button onclick="capturarDashboard()" class="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded">Capturar PNG</button>
+    </header>
+
+    <div class="sidebar" id="sidebar">
+        <button onclick="toggleSidebar()" class="toggle-btn">⇆</button>
+        <p class="text-white"> Añadir Filtros aquí</p>
+    </div>
+
+    <div class="content">
+        <div id="sheet0" class="sheet active"><h2 class="sheet-title" contenteditable="true">Hoja Principal</h2></div>
+<div id="sheet1" class="sheet"><h2 class="sheet-title" contenteditable="true">Products</h2></div>
+<div id="sheet2" class="sheet"><h2 class="sheet-title" contenteditable="true">Customers</h2></div>
+<div id="sheet3" class="sheet"><h2 class="sheet-title" contenteditable="true">Proveedors</h2></div>
+    </div>
+
+    <footer class="footer">
+        <p class="text-white">© 2025 - Empresa Dashboard</p>
+        <button class="pagination-btn" onclick="showSheet('sheet0', 'Hoja Principal')">Hoja Principal</button>
+<button class="pagination-btn" onclick="showSheet('sheet1', 'Products')">Products</button>
+<button class="pagination-btn" onclick="showSheet('sheet2', 'Customers')">Customers</button>
+<button class="pagination-btn" onclick="showSheet('sheet3', 'Proveedors')">Proveedors</button>
+    </footer>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.querySelector('.content').classList.toggle('collapsed');
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        function publicarDashboard() {
+            let url = prompt("Introduce la URL de publicación:");
+            if (url && url.startsWith("http")) {
+                alert("Publicando en " + url);
+            } else {
+                alert("No se ingresó una URL válida.");
+            }
+        }
+
+        function generarPDF() {
+            document.querySelectorAll('.hide-on-export').forEach(el => el.style.display = 'none');
+            window.print();
+            document.querySelectorAll('.hide-on-export').forEach(el => el.style.display = 'block');
+        }
+
+        function showSheet(sheetId, sheetTitle) {
+            document.querySelectorAll('.sheet').forEach(sheet => sheet.classList.remove('active'));
+            document.getElementById(sheetId).classList.add('active');
+            document.getElementById('page-title').innerText = sheetTitle;
+        }
+
+        function capturarDashboard() {
+            html2canvas(document.body).then(canvas => {
+                let imgData = canvas.toDataURL("image/png");
+                let link = document.createElement("a");
+                link.href = imgData;
+                link.download = "dashboard.png";
+                link.click();
+            });
+        }
+    </script>
+
+</body>
+</html>
